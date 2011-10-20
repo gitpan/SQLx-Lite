@@ -1,14 +1,13 @@
 package SQLx::Lite;
 
-use strict;
-use warnings;
 use 5.010;
 use DBI;
 
-use base 'SQLx::Lite::DBH';
-use base 'SQLx::Lite::ResultSet';
+use SQLx::Lite::DBH;
+use SQLx::Lite::ResultSet;
+use SQLx::Lite::Result;
 
-$SQLx::Lite::VERSION = '3.0.5_001';
+$SQLx::Lite::VERSION = '3.0.5_002';
 
 =head1 NAME
 
