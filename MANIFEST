@@ -15,12 +15,14 @@ lib/SQLx/Lite.pm
 lib/SQLx/Lite/DBH.pm
 lib/SQLx/Lite/Result.pm
 lib/SQLx/Lite/ResultSet.pm
+lib/SQLx/Lite/Schema.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
 README
 SQLx-Lite-3.0.5_001.tar.gz
 SQLx-Lite-3.0.5_002.tar.gz
+SQLx-Lite-3.0.5_003.tar.gz
 t/00-load.t
 t/manifest.t
 t/pod-coverage.t

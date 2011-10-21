@@ -3,11 +3,11 @@ package SQLx::Lite;
 use 5.010;
 use DBI;
 
-use SQLx::Lite::DBH;
+use SQLx::Lite::Schema;
 use SQLx::Lite::ResultSet;
 use SQLx::Lite::Result;
 
-$SQLx::Lite::VERSION = '3.0.5_003';
+$SQLx::Lite::VERSION = '3.0.5_004';
 
 =head1 NAME
 
@@ -76,7 +76,7 @@ sub connect {
     };
 
     my $dbh = { dbh => $dbh };
-    bless $dbh, 'SQLx::Lite::DBH';
+    bless $dbh, 'SQLx::Lite::Schema';
 }
 
 =head1 AUTHOR
