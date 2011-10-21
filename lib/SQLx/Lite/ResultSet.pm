@@ -11,7 +11,7 @@ use SQL::Abstract;
 our $sql = SQL::Abstract->new;
 use vars qw/$sql/;
 
-our $VERSION = '3.0.5_005';
+our $VERSION = '3.0.6';
 
 =head2 primary_key
 

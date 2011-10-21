@@ -24,6 +24,7 @@ SQLx-Lite-3.0.5_001.tar.gz
 SQLx-Lite-3.0.5_002.tar.gz
 SQLx-Lite-3.0.5_003.tar.gz
 SQLx-Lite-3.0.5_004.tar.gz
+SQLx-Lite-3.0.5_005.tar.gz
 t/00-load.t
 t/manifest.t
 t/pod-coverage.t
