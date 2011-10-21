@@ -6,7 +6,12 @@ SQLx::Lite::ResultSet - Methods for searching and altering tables
 
 =cut
 
-our $VERSION = '3.0.5_001';
+use SQL::Abstract;
+
+our $sql = SQL::Abstract->new;
+use vars qw/$sql/;
+
+our $VERSION = '3.0.5_003';
 
 =head2 primary_key
 
@@ -35,33 +40,59 @@ The second parameter is a hash of keys and values of what to search for.
     my $res = $resultset->search([qw/name id status/], { status => 'active' });
 
     my $res = $resultset->search([], { status => 'disabled' });
+    
+    my $res = $resultset->search([], { -or => [ name => 'Test', name => 'Foo' ], status => 'active' });
 
 =cut
 
 sub search {
-    my ($self, $sel, $c) = @_;
-    my @n_val;
-    my @attr;
-    my @val;
-    for (keys %$c) {
-        push @attr, "$_ = ?";
-        push @val, $c->{$_};
-        push @n_val, "$_ = '$c->{$_}'";
-    }
-    my $n_val = join ' AND ', @n_val;
-    my $attr = join ' AND ', @attr;
-    my $select = (scalar @$sel > 0) ? join ',', @$sel : '*';
-    my $sql = "SELECT $select FROM $self->{table} WHERE $attr";
-    my $sth = $self->{dbh}->prepare($sql);
+    my ($self, $fields, $c) = @_;
+    if (scalar @$fields == 0) { push @$fields, '*'; }
+    my ($stmt, @bind) = $sql->select($self->{table}, $fields, $c);
+    my ($wstmt, @wbind) = $sql->where($c);
     my $rs = {
-        attr   => $attr,
-        n_attr   => $n_val, 
-        bind_attr => \@val,
-        table   => $self->{table},
-        result => $self->{dbh}->selectall_arrayref($sql, { Slice => {} }, @val),
         dbh    => $self->{dbh},
+        result => $self->{dbh}->selectall_arrayref($stmt, { Slice => {} }, @bind),
+        stmt   => $wstmt,
+        bind   => \@wbind,
+        #where  => $sql->generate('where', $c),
+        where  => $c,
+        table  => $self->{table},
     };
+    
     return bless $rs, 'SQLx::Lite::Result';
+}
+
+=head2 insert
+
+Inserts a new record into the current resultset.
+
+    my $insert = $resultset->insert({name => 'Foo', user => 'foo_bar', pass => 'baz'});
+    if ($insert) { print "Added user!\n"; }
+    else { print "Could not add user\n"; }
+
+=cut
+
+sub insert {
+    my ($self, $c) = @_;
+    
+    my ($stmt, @bind) = $sql->insert($self->{table}, $c);
+    my $sth = $self->{dbh}->prepare($stmt);
+    my $result = $sth->execute(@bind);
+
+    # make sure it succeeded
+    my $res = $self->search([], $c);
+
+    if ($res->count) {
+        my $rs = {
+            dbh   => $self->{dbh},
+            where => $c,
+            table => $self->{table},
+        };
+        
+        return bless $rs, 'SQLx::Lite::Result';
+    }
+    else { return 0; }    
 }
 
 1;

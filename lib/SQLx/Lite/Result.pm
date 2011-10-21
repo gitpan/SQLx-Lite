@@ -11,8 +11,12 @@ as a SQLx::Lite::Result, allowing you to perform Result actions on
 that object.
 
 =cut 
+use SQL::Abstract;
+our $sql = SQL::Abstract->new;
 
-our $VERSION = '3.0.5_001';
+use vars qw/$sql/;
+
+our $VERSION = '3.0.5_003';
 
 =head2 result
 
@@ -44,8 +48,7 @@ sub count {
 
 =head2 update
 
-Uses the result currently set as the result to update it using 
-the arguments defined in the hash.
+Updates the current result using the hash specified
 
     my $res = $dbh->resultset('foo_table')->search([], { id => 5132 });
     if ($res->update({name => 'New Name'})) {
@@ -55,26 +58,30 @@ the arguments defined in the hash.
 =cut
 
 sub update {
-    my ($self, $args) = @_;
+    my ($self, $fieldvals) = @_;
 
-    my $set;
-    my $sql;
-    if (scalar keys %$args < 2) {
-        for (keys %$args) { $set = "$_ = '$args->{$_}'"; }
-    }
-    else {
-        my @attr;
-        my @val;
-        for (keys %$args) {
-            push @attr, "$_ = '$args->{$_}'";
-        }
-        $set = join ', ', @attr;
-    }
-    $sql = "UPDATE $self->{table} SET $set WHERE $self->{n_attr}";
-    say $sql;
-    my $rows = $self->{dbh}->do($sql);
-    if ($rows > 0) { return 1; }
-    return 0;
+    my ($stmt, @bind) = $sql->update($self->{table}, $fieldvals, $self->{where});
+    my $sth = $self->{dbh}->prepare($stmt);
+    if ($sth->execute(@bind)) { return 1; }
+    else { return 0; }
+}
+
+=head2 delete
+
+Drops the records in the current search result
+
+    my $res = $resultset->search([], { id => 2 });
+    $res->delete; # gone!
+
+=cut
+
+sub delete {
+    my ($self) = @_;
+
+    my ($stmt, @bind) = $sql->delete($self->{table}, $self->{where});
+
+    my $sth = $self->{dbh}->prepare($stmt);
+    $sth->execute(@bind);
 }
 
 1;

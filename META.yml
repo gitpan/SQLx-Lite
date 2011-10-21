@@ -1,5 +1,5 @@
 ---
-abstract: 'Modernish interface to the DBI module'
+abstract: 'Modernish and friendly interface to DBI'
 author:
   - 'Brad Haywood <brad@geeksware.net>'
   - 'Brad Haywood <brad@geeksware.net>'
@@ -23,4 +23,4 @@ requires:
   perl: 5.10.0
 resources:
   license: http://dev.perl.org/licenses/
-version: 3.0.5_002
+version: 3.0.5_003

@@ -7,11 +7,11 @@ use SQLx::Lite::DBH;
 use SQLx::Lite::ResultSet;
 use SQLx::Lite::Result;
 
-$SQLx::Lite::VERSION = '3.0.5_002';
+$SQLx::Lite::VERSION = '3.0.5_003';
 
 =head1 NAME
 
-SQLx::Lite - Modernish interface to the DBI module
+SQLx::Lite - Modernish and friendly interface to DBI
 
 =head1 DESCRIPTION
 
@@ -26,11 +26,11 @@ to search for results and update them
 
     use SQLx::Lite;
 
-    my $dbh = SQLx::Lite->new(
+    my $dbh = SQLx::Lite->connect(
         dbi    => 'Pg:host=localhost;dbname=test',
         user   => 'username',
         pass   => 'password',
-    )->connect;
+    );
 
     my $res = $dbh->resultset('users')->search([], { user => 'foo', pass => 'bar' });
     
@@ -44,17 +44,17 @@ to search for results and update them
 
 =cut
 
-=head2 new
+=head2 connect
 
-Sets the needed parameters to connect to DBI. Currently, 
-there is dbi, user and pass. Obviously if you're using 
-SQLite then you can ommit the username and password.
+Creates the DBI instance using the hash specified. Currently only dbi is mandatory, 
+which tells DBI which engine to use (SQLite, Pg, etc).
+If you're using SQLite there is no need to set user or pass.
 
-    my $s = SQLx::Lite->new(
+    my $dbh = SQLx::Lite->connect(
         dbi => 'SQLite:/var/db/test.db',
     );
 
-    my $s = SQLx::Lite->new(
+    my $dbh = SQLx::Lite->connect(
         dbi  => 'Pg:host=myhost;dbname=dbname',
         user => 'username',
         pass => 'password',
@@ -62,58 +62,21 @@ SQLite then you can ommit the username and password.
 
 =cut
 
-sub new {
+sub connect {
     my ($class, %args) = @_;
 
-    my $self = {};
-    for (keys %args) {
-        $self->{$_} = $args{$_};
-    };
-    
-    return bless $self, $class;
-}
-
-=head2 connect
-
-Blesses the DBI connection, if it succeeds as SQLx::Lite::DBH so you 
-can use it in resultsets (Tables).
-
-    $dbh = $sqlobj->connect;
-
-The best way to do this is read the SYNOPSIS.
-
-=cut
-
-sub connect {
-    my $self = shift;
-
     my $dbh = DBI->connect(
-        'dbi:' . $self->{dbi},
-        $self->{user}||undef,
-        $self->{pass}||undef,
+        'dbi:' . $args{dbi},
+        $args{user}||undef,
+        $args{pass}||undef,
         { PrintError => 0 }
     ) or do {
-        $self->last_error('Could not connect to database: ' . $DBI::errstr);
+        warn 'Could not connect to database: ' . $DBI::errstr;
         return 0;
     };
 
-    $self->{instance}->{dbh} = { dbh => $dbh };
-    bless $self->{instance}->{dbh}, 'SQLx::Lite::DBH';
-    
-    return $self->{instance}->{dbh};
-}
-
-=head2 last_error
-
-Set or returns the last error
-
-=cut
-
-sub last_error {
-    my ($self, $err) = @_;
-
-    if ($err) { $self->{last_error} = $err; }
-    return $self->{last_error};
+    my $dbh = { dbh => $dbh };
+    bless $dbh, 'SQLx::Lite::DBH';
 }
 
 =head1 AUTHOR
@@ -122,7 +85,7 @@ Brad Haywood <brad@geeksware.net>
 
 =head1 LICENSE
 
-Same License as Perl
+Same license as Perl
 
 =cut
 
