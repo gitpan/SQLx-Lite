@@ -7,7 +7,7 @@ use SQLx::Lite::Schema;
 use SQLx::Lite::ResultSet;
 use SQLx::Lite::Result;
 
-$SQLx::Lite::VERSION = '3.0.5_004';
+$SQLx::Lite::VERSION = '3.0.5_005';
 
 =head1 NAME
 
@@ -75,8 +75,8 @@ sub connect {
         return 0;
     };
 
-    my $dbh = { dbh => $dbh };
-    bless $dbh, 'SQLx::Lite::Schema';
+    my $dbhx = { dbh => $dbh };
+    bless $dbhx, 'SQLx::Lite::Schema';
 }
 
 =head1 AUTHOR

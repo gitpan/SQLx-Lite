@@ -11,12 +11,39 @@ as a SQLx::Lite::Result, allowing you to perform Result actions on
 that object.
 
 =cut 
+
 use SQL::Abstract;
 our $sql = SQL::Abstract->new;
 
 use vars qw/$sql/;
 
-our $VERSION = '3.0.5_004';
+our $VERSION = '3.0.5_005';
+
+=head2 next
+
+A simple iterator to loop through a result
+
+    while(my $row = $result->next) {
+        print $row->{name};
+    }
+
+=cut
+
+sub next {
+    my $self = shift;
+    if (! exists $self->{_it_pos}) {
+        $self->{_it_pos} = 0;
+        $self->{_it_max} = scalar @{$self->{result}};
+    }
+    my $pos = $self->{_it_pos};
+    $self->{_it_pos}++;
+    if ($self->{_it_pos} > $self->{_it_max}) {
+        delete $self->{_it_pos};
+        delete $self->{_it_max};
+        return undef;
+    }
+    return $self->{result}->[$pos];
+}
 
 =head2 result
 
