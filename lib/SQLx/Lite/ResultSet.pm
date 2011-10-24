@@ -11,7 +11,7 @@ use SQL::Abstract;
 our $sql = SQL::Abstract->new;
 use vars qw/$sql/;
 
-our $VERSION = '3.0.6';
+our $VERSION = '3.0.8';
 
 =head2 primary_key
 
@@ -58,6 +58,7 @@ sub search {
         #where  => $sql->generate('where', $c),
         where  => $c,
         table  => $self->{table},
+        primary_key => $self->{primary_key},
     };
     
     return bless $rs, 'SQLx::Lite::Result';
@@ -91,6 +92,7 @@ sub insert {
             where  => $c,
             table  => $self->{table},
             result => $self->{dbh}->selectall_arrayref($stmt, { Slice => {} }, @bind),
+            primary_key => $self->{primary_key},
         };
         
         return bless $rs, 'SQLx::Lite::Result';

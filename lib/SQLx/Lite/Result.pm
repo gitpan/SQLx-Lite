@@ -17,7 +17,7 @@ our $sql = SQL::Abstract->new;
 
 use vars qw/$sql/;
 
-our $VERSION = '3.0.7';
+our $VERSION = '3.0.8';
 
 =head2 next
 
@@ -63,9 +63,13 @@ sub result {
 
 sub insert_id {
     my ($self) = @_;
-
-    if (exists $self->{result}->[scalar(@{$self->{result}})-1]->{id}) {
-        return $self->{result}->[scalar(@{$self->{result}})-1]->{id};
+    
+    if (! exists $self->{primary_key}) {
+        warn "Can't call insert_id on result when no primary_key was defined in the ResultSet";
+        return 0;
+    }
+    if (exists $self->{result}->[scalar(@{$self->{result}})-1]->{$self->{primary_key}}) { 
+        return $self->{result}->[scalar(@{$self->{result}})-1]->{$self->{primary_key}};
     }
     
     return 0;
