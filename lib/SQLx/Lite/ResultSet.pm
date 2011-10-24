@@ -82,12 +82,15 @@ sub insert {
 
     # make sure it succeeded
     my $res = $self->search([], $c);
-
+#    $result =  $self->{dbh}->selectall_arrayref($sql->select($self->{table}, [], $c), { Slice => {} }, @bind);
+    ($stmt, @bind) = $sql->select($self->{table}, ['*'], $c);
+    
     if ($res->count) {
         my $rs = {
-            dbh   => $self->{dbh},
-            where => $c,
-            table => $self->{table},
+            dbh    => $self->{dbh},
+            where  => $c,
+            table  => $self->{table},
+            result => $self->{dbh}->selectall_arrayref($stmt, { Slice => {} }, @bind),
         };
         
         return bless $rs, 'SQLx::Lite::Result';

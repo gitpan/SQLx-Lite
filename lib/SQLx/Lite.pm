@@ -7,7 +7,7 @@ use SQLx::Lite::Schema;
 use SQLx::Lite::ResultSet;
 use SQLx::Lite::Result;
 
-$SQLx::Lite::VERSION = '3.0.6';
+$SQLx::Lite::VERSION = '3.0.7';
 
 =head1 NAME
 
@@ -19,8 +19,6 @@ This module is an attempt at a friendly interface to the DBI module. While
 DBI is fantastic, it can be a little daunting to use if you've never used it 
 before.
 SQLx::Lite attempts to make using it easy, and a little more modern.
-This module is still under _heavy_ development and currently only allows you 
-to search for results and update them
 
 =head1 SYNOPSIS
 
@@ -37,7 +35,7 @@ to search for results and update them
     if ($res->count > 0) {
         print "Found " . $res->count . " row(s)\n";
         
-        for my $row (@{$res->result}) {
+        while(my $row = $res->next) {
             print "Username: $row->{user}\n";
         }
     }

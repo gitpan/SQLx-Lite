@@ -17,7 +17,7 @@ our $sql = SQL::Abstract->new;
 
 use vars qw/$sql/;
 
-our $VERSION = '3.0.6';
+our $VERSION = '3.0.7';
 
 =head2 next
 
@@ -59,6 +59,16 @@ sub result {
     my ($self, $key) = @_;
     if ($key) { return $self->{result}->[0]->{$key}||0; }
     return $self->{result}||0;
+}
+
+sub insert_id {
+    my ($self) = @_;
+
+    if (exists $self->{result}->[scalar(@{$self->{result}})-1]->{id}) {
+        return $self->{result}->[scalar(@{$self->{result}})-1]->{id};
+    }
+    
+    return 0;
 }
 
 =head2 count
